@@ -1,6 +1,5 @@
 import logging
 import json
-
 from flask import Blueprint, request, jsonify, current_app
 
 from .decorators.security import signature_required
@@ -10,7 +9,6 @@ from .utils.whatsapp_utils import (
 )
 
 webhook_blueprint = Blueprint("webhook", __name__)
-
 
 def handle_message():
     """
@@ -27,7 +25,7 @@ def handle_message():
         response: A tuple containing a JSON response and an HTTP status code.
     """
     body = request.get_json()
-    # logging.info(f"request body: {body}")
+    logging.info(f"request body: {body}")
 
     # Check if it's a WhatsApp status update
     if (
@@ -53,8 +51,7 @@ def handle_message():
         logging.error("Failed to decode JSON")
         return jsonify({"status": "error", "message": "Invalid JSON provided"}), 400
 
-
-# Required webhook verifictaion for WhatsApp
+# Required webhook verification for WhatsApp
 def verify():
     # Parse params from the webhook verification request
     mode = request.args.get("hub.mode")
@@ -76,7 +73,6 @@ def verify():
         logging.info("MISSING_PARAMETER")
         return jsonify({"status": "error", "message": "Missing parameters"}), 400
 
-
 @webhook_blueprint.route("/webhook", methods=["GET"])
 def webhook_get():
     return verify()
@@ -85,5 +81,3 @@ def webhook_get():
 @signature_required
 def webhook_post():
     return handle_message()
-
-
